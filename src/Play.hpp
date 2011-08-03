@@ -14,25 +14,22 @@ struct TraitC {
       throw "can't change dims on compile time traits";
     }
   }
-  static int ndim1() { return NDIM1; }
-  static int ndim2() { return NDIM2; }
+  static const int ndim1 = NDIM1;
+  static const int ndim2 = NDIM2;
 };
 
 // This "trait" class allows you to change the dimensions
 // via static members at runtime
 struct TraitR {
   static void set_dims(const int dim1, const int dim2) {
-    s_ndim1 = dim1;
-    s_ndim2 = dim2;
+    ndim1 = dim1;
+    ndim2 = dim2;
   }
-  static int ndim1() { return s_ndim1; }
-  static int ndim2() { return s_ndim2; }
-private:
-  static int s_ndim1;
-  static int s_ndim2;
+  static int ndim1;
+  static int ndim2;
 };
-int TraitR::s_ndim1 = 0;
-int TraitR::s_ndim2 = 0;
+int TraitR::ndim1 = 0;
+int TraitR::ndim2 = 0;
 
 // A templated class that uses traits to get dimensions.
 // Question: if T is such that ndimX are known at compile
@@ -40,7 +37,7 @@ int TraitR::s_ndim2 = 0;
 template <class T>
 struct Expr {
   int product() {
-    return T::ndim1() * T::ndim2();
+    return T::ndim1 * T::ndim2;
   }
 };
 
