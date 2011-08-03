@@ -22,4 +22,4 @@
     </code></pre>
 
 ## TODO
- - Everything
+ - See if optimizers will do what we're after...
