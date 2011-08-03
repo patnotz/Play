@@ -11,7 +11,7 @@ template <int NDIM1, int NDIM2>
 struct TraitC {
   static void set_dims(const int dim1, const int dim2) {
     if (dim1 != NDIM1 || dim2 != NDIM2) {
-      throw "can't set_dims on compile time traits";
+      throw "can't change dims on compile time traits";
     }
   }
   static int ndim1() { return NDIM1; }
