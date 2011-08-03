@@ -5,8 +5,6 @@
 #include <iostream>
 
 namespace play {
-typedef double ScalarT;
-typedef int IndexT;
 
 // This "trait" class has the dimensions fixed at compile time
 template <int NDIM1, int NDIM2>
