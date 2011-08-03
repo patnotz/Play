@@ -39,6 +39,10 @@ struct Expr {
   int product() {
     return T::ndim1 * T::ndim2;
   }
+  int product(const int dim1, const int dim2) {
+    T::set_dims(dim1, dim2);
+    return product();
+  }
 };
 
 }  // namespace play

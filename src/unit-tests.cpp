@@ -24,3 +24,19 @@ TEST(Play, RunTimeTraits)
   ASSERT_NO_THROW(TraitR::set_dims(2, 2));
   ASSERT_EQ(4, e.product());
 }
+
+TEST(Play, CompileTimeTraits2)
+{
+  typedef play::TraitC<2,3> TraitC;
+  play::Expr<TraitC> e;
+  ASSERT_EQ(6, e.product(2, 3));
+  ASSERT_ANY_THROW(e.product(2, 4));
+}
+
+TEST(Play, RunTimeTraits2)
+{
+  typedef typename play::TraitR TraitR;
+  play::Expr<TraitR> e;
+  ASSERT_EQ(6, e.product(2, 3));
+  ASSERT_EQ(8, e.product(2, 4));
+}
