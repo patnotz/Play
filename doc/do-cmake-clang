@@ -1,0 +1,14 @@
+#!/bin/bash
+
+EXTRA_ARGS=$@
+
+rm -f CMakeCache.txt
+
+cmake \
+ -D CMAKE_CXX_COMPILER:STRING=clang++ \
+ -D CMAKE_C_COMPILER:STRING=clang \
+ -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+ $EXTRA_ARGS ..
+
+# -D CMAKE_CXX_FLAGS:STRING="-restrict -fno-alias -inline-level=2 -unroll-aggressive -ip -xHost -vec-report5" \
+# -D CMAKE_EXE_LINKER_FLAGS:STRING="-L/opt/local/lib" \

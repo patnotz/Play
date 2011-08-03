@@ -1,0 +1,14 @@
+#!/bin/bash
+
+EXTRA_ARGS=$@
+
+rm -f CMakeCache.txt
+
+cmake \
+ -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+ $EXTRA_ARGS ..
+
+# -D CMAKE_CXX_FLAGS:STRING="-ftree-vectorizer-verbose=6" \
+# -D CMAKE_CXX_COMPILER:STRING=/opt/local/bin/g++ \
+# -D CMAKE_C_COMPILER:STRING=/opt/local/bin/gcc \
+# -D CMAKE_EXE_LINKER_FLAGS:STRING="-L/opt/local/lib" \
