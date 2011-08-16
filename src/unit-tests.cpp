@@ -40,3 +40,38 @@ TEST(Play, RunTimeTraits2)
   ASSERT_EQ(6, e.product(2, 3));
   ASSERT_EQ(8, e.product(2, 4));
 }
+
+TEST(Play, CompileTimeArray2)
+{
+  const int ndim1 = 2;
+  const int ndim2 = 3;
+  typedef play::TraitC<ndim1,ndim2> Traits;
+  typedef typename Traits::ARRAY2D Array2D;
+  Array2D a(ndim1, ndim2);
+  for(int i=0; i < ndim1; ++i) {
+    for(int j=0; j < ndim2; ++j) {
+      a(i,j) = 20;
+    }
+  }
+  ASSERT_DOUBLE_EQ(20, a(ndim1-1,ndim2-1));
+  ASSERT_NO_THROW(a.resize(ndim1, ndim2));
+  ASSERT_ANY_THROW(a.resize(ndim1+1, ndim2));
+  ASSERT_ANY_THROW(Array2D b(ndim1+1,ndim2));
+}
+
+TEST(Play, RunTimeArray2)
+{
+  const int ndim1 = 2;
+  const int ndim2 = 3;
+  typedef play::TraitR Traits;
+  typedef typename Traits::ARRAY2D Array2D;
+  Array2D a(ndim1,ndim2);
+  for(int i=0; i < ndim1; ++i) {
+    for(int j=0; j < ndim2; ++j) {
+      a(i,j) = 20;
+    }
+  }
+  ASSERT_DOUBLE_EQ(20, a(ndim1-1,ndim2-1));
+  ASSERT_NO_THROW(a.resize(ndim1, ndim2));
+  ASSERT_NO_THROW(a.resize(ndim1+1, ndim2));
+}
