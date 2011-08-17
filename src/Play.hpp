@@ -2,7 +2,8 @@
 #ifndef SRC_PLAY_HPP_
 #define SRC_PLAY_HPP_
 
-#include <iostream>
+#include <vector>
+#include <stdexcept>
 
 namespace play {
 
@@ -58,7 +59,7 @@ struct ArrayC1 {
   }
   void resize(const int ndim1) {
     if (ndim1 != NDIM1) {
-      throw "can't change dims on compile time array";
+      throw std::range_error("cannot change dims on compile time array");
     }
   }
   double & operator()(const int i) {
@@ -77,7 +78,7 @@ struct ArrayC2 {
   }
   void resize(const int ndim1, const int ndim2) {
     if (ndim1 != NDIM1 || ndim2 != NDIM2) {
-      throw "can't change dims on compile time array";
+      throw std::range_error("cannot change dims on compile time array");
     }
   }
   double & operator()(const int i, const int j) {
@@ -86,12 +87,12 @@ struct ArrayC2 {
   double m_array[NDIM1][NDIM2];
 };
 
-// This "trait" class has the dimensions fixed at compile time
+// This "traits" class has the dimensions fixed at compile time
 template <int NDIM1, int NDIM2>
-struct TraitC {
+struct TraitsC {
   static void set_dims(const int dim1, const int dim2) {
     if (dim1 != NDIM1 || dim2 != NDIM2) {
-      throw "can't change dims on compile time traits";
+      throw std::range_error("cannot change dims on compile time array");
     }
   }
   static const int ndim1 = NDIM1;
@@ -100,9 +101,9 @@ struct TraitC {
   typedef ArrayC2<NDIM1,NDIM2> ARRAY_12;
 };
 
-// This "trait" class allows you to change the dimensions
+// This "traits" class allows you to change the dimensions
 // via static members at runtime
-struct TraitR {
+struct TraitsR {
   static void set_dims(const int dim1, const int dim2) {
     ndim1 = dim1;
     ndim2 = dim2;
@@ -112,22 +113,30 @@ struct TraitR {
   typedef ArrayR1 ARRAY_1;
   typedef ArrayR2 ARRAY_12;
 };
-int TraitR::ndim1 = 0;
-int TraitR::ndim2 = 0;
+int TraitsR::ndim1 = 0;
+int TraitsR::ndim2 = 0;
 
-// A templated class that uses traits to get dimensions.
+// A template class that uses traits to get dimensions.
 // Question: if T is such that ndimX are known at compile
 // time will the optimizer unroll loops, etc.?
+struct ExprBase {
+  virtual ~ExprBase() {}
+  virtual void set_dims(const int dim1, const int dim2) = 0;
+  virtual void eval(const int dim1, const int dim2) = 0;
+  virtual double result() = 0;
+};
+
 template <class T>
-struct Expr {
-  void set_dims(const int dim1, const int dim2) {
-    T::set_dims(dim1, dim2);
+struct Expr : ExprBase {
+  typedef T Traits;
+  virtual ~Expr() {}
+  virtual void set_dims(const int dim1, const int dim2) {
+    Traits::set_dims(dim1, dim2);
     values.resize(dim1);
     vector.resize(dim1,dim2);
   }
-  int eval(const int dim1, const int dim2) {
+  virtual void eval(const int dim1, const int dim2) {
     set_dims(dim1, dim2);
-    int result = 0;
     for(int i=0; i < T::ndim1; ++i) {
       values(i) = 0;
       for(int j=0; j < T::ndim2; ++j) {
@@ -135,10 +144,12 @@ struct Expr {
         values(i) += vector(i,j) * vector(i,j);
       }
     }
-    return result;
   }
-  typename T::ARRAY_1 values;
-  typename T::ARRAY_12 vector;
+  virtual double result() {
+    return values(0);
+  }
+  typename Traits::ARRAY_1 values;
+  typename Traits::ARRAY_12 vector;
 };
 
 }  // namespace play
