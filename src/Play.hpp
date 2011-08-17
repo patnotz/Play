@@ -6,6 +6,25 @@
 
 namespace play {
 
+struct ArrayR1 {
+  ArrayR1()
+    : m_ndim1(0) {}
+  ArrayR1(
+      const int ndim1)
+    : m_ndim1(ndim1) {
+    resize(ndim1);
+  }
+  void resize(const int ndim1) {
+    m_ndim1 = ndim1;
+    m_array.resize(ndim1);
+  }
+  double & operator()(const int i) {
+    return *(m_array.begin() + i);
+  }
+  int m_ndim1;
+  std::vector<double> m_array;
+};
+
 struct ArrayR2 {
   ArrayR2()
     : m_ndim1(0),
@@ -28,6 +47,24 @@ struct ArrayR2 {
   int m_ndim1;
   int m_ndim2;
   std::vector<double> m_array;
+};
+
+template <int NDIM1>
+struct ArrayC1 {
+  ArrayC1() {}
+  ArrayC1(
+      const int ndim1) {
+    resize(ndim1);
+  }
+  void resize(const int ndim1) {
+    if (ndim1 != NDIM1) {
+      throw "can't change dims on compile time array";
+    }
+  }
+  double & operator()(const int i) {
+    return m_array[i];
+  }
+  double m_array[NDIM1];
 };
 
 template <int NDIM1, int NDIM2>
@@ -59,7 +96,8 @@ struct TraitC {
   }
   static const int ndim1 = NDIM1;
   static const int ndim2 = NDIM2;
-  typedef ArrayC2<NDIM1,NDIM2> ARRAY2D;
+  typedef ArrayC1<NDIM1> ARRAY_1;
+  typedef ArrayC2<NDIM1,NDIM2> ARRAY_12;
 };
 
 // This "trait" class allows you to change the dimensions
@@ -71,7 +109,8 @@ struct TraitR {
   }
   static int ndim1;
   static int ndim2;
-  typedef ArrayR2 ARRAY2D;
+  typedef ArrayR1 ARRAY_1;
+  typedef ArrayR2 ARRAY_12;
 };
 int TraitR::ndim1 = 0;
 int TraitR::ndim2 = 0;
@@ -81,13 +120,25 @@ int TraitR::ndim2 = 0;
 // time will the optimizer unroll loops, etc.?
 template <class T>
 struct Expr {
-  int product() {
-    return T::ndim1 * T::ndim2;
-  }
-  int product(const int dim1, const int dim2) {
+  void set_dims(const int dim1, const int dim2) {
     T::set_dims(dim1, dim2);
-    return product();
+    values.resize(dim1);
+    vector.resize(dim1,dim2);
   }
+  int eval(const int dim1, const int dim2) {
+    set_dims(dim1, dim2);
+    int result = 0;
+    for(int i=0; i < T::ndim1; ++i) {
+      values(i) = 0;
+      for(int j=0; j < T::ndim2; ++j) {
+        vector(i,j) = j+1;
+        values(i) += vector(i,j) * vector(i,j);
+      }
+    }
+    return result;
+  }
+  typename T::ARRAY_1 values;
+  typename T::ARRAY_12 vector;
 };
 
 }  // namespace play
