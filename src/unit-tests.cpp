@@ -15,7 +15,7 @@ TEST(Play, CompileTimeTraits) {
 TEST(Play, RunTimeTraits) {
   const int ndim1 = 2;
   const int ndim2 = 3;
-  typedef typename play::TraitsR TraitsR;
+  typedef play::TraitsR TraitsR;
   play::Expr<TraitsR> e;
 
   ASSERT_NO_THROW(e.eval(ndim1, ndim2));
@@ -28,7 +28,7 @@ TEST(Play, VirtualBase) {
   const int ndim1 = 2;
   const int ndim2 = 3;
   typedef play::TraitsC<ndim1, ndim2> TraitsC;
-  typedef typename play::TraitsR TraitsR;
+  typedef play::TraitsR TraitsR;
 
   play::ExprBase* e = new play::Expr<TraitsR>();
   ASSERT_NO_THROW(e->eval(ndim1, ndim2));
